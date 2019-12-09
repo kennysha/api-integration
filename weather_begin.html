@@ -9,6 +9,7 @@
 		padding: 5px;
 	}
 	#forecast{
+        display: none;
 		/*This div should not appear until the weather is returned.*/
 	}
 	#forecast div{
@@ -21,28 +22,64 @@
 		width:100%;
 	}
 </style>
-<script>
-    function gettingJSON(){
-    	console.log("Hi")
-    	// Use the OpenWeather API to return:
-    	//  the current temperature 
-    	//  the high temperature for the day
-    	//  the low temperature for the day
-    	//  the icon for the current weather.
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>function gettingJSON() {
+        console.log("Hi")
+        // Use the OpenWeather API to return:
+        //  the current temperature
+        //  the high temperature for the day
+        //  the low temperature for the day
+        //  the icon for the current weather.
+
+        // You will need to update this query with the city, weather format (Celsius or Fahrenheit) and your OpenWeatherMap ID
+
+        // Right now I have it set to Chicago.  The default should be Ann Abor/Fahreheit.
+
+
+        $("#forecast").click(function () {
+            $(this).css("display", "block");
+        })
+        var shanskey = "f51d7f84e37812b483cd23e08d8f2791";
 
 
 
-    	// You will need to update this query with the city, weather format (Celsius or Fahrenheit) and your OpenWeatherMap ID
-    	 
-    	// Right now I have it set to Chicago.  The default should be Ann Abor/Fahreheit.
-		let query = "http://api.openweathermap.org/data/2.5/weather?q=Chicago&APPID=" +YourWeatherAppID;
-        console.log("Query is :" + query)
+        var location = $('#location').val()
+        var query = '';
+        if (location.length > 0) {
+            query = "http://api.openweathermap.org/data/2.5/weather?q=" + location + "APPID=" + shanskey;
+        } else {
+            query = "http://api.openweathermap.org/data/2.5/weather?q=Chicago&APPID=" + shanskey;
+        }
 
-        $.getJSON(query,function(json){
-            console.log(JSON.stringify(json));
-    })
-    }
-    </script>
+
+        $.ajax({
+            type: "GET",
+            url: query,
+            dataType: "text",
+            success: function (data) {
+                console.log('data', json);
+                var json = JSON.stringify(data);
+                current_temp = json.main.temp;
+                $("#temp").html(current_temp);
+
+                temp_min = json.weather.main.temp_min;
+                $("#low").html(temp_min);
+
+                temp_max = json.weather.main.temp_max;
+                $("#high").html(temp_max);
+
+                icon = json.weather.icon;
+                $("#tempImg").attr("src", icon);
+            },
+            error: function (textStatus, errorThrown) {
+
+            }
+
+        });
+
+
+
+    }</script>
 </head>
 <body>
 	<!-- DO NOT CHANGE ANY CODE IN THE BODY OF THIS FILE. -->
